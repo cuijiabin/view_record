@@ -8,11 +8,11 @@ public class ViewRecordTest {
 
 	@Test
 	public void testRunKeys() throws Exception {
-		CombinationExtract.extractKeys("10");
+		CombinationExtract.extractKeys("12");
 	}
 	
 	@Test
 	public void testRunSql() throws Exception {
-		CombinationExtract.extractRun("10");
+		CombinationExtract.extractRun("12");
 	}
 }
