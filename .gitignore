@@ -1,7 +1,33 @@
-/target
+# Maven #
+target/
+
+# IDEA #
+.idea/
+*.iml
+
+# Eclipse #
+.settings/
 .classpath
 .project
-.settings
-*/.classpath
-*/.project
-*/.settings
+
+.project
+/*/.project
+/*/src/META-INF
+
+META-INF
+/*/META-INF
+/*/META-INF/*
+
+bin
+/*/bin
+/*/bin/*
+
+.DS_Store
+/*/.DS_Store
+
+# jrebel #
+rebel.xml
+src/main/resources/rebel.xml
+*.log
+/*.log
+*.lck

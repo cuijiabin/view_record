@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd"
+	default-lazy-init="true">
+	
+	<!-- Data Source -->
+	<bean id="logdataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close"
+		p:driverClassName="${log.jdbc.driver}"
+		p:url="${log.jdbc.url}"
+		p:username="${log.jdbc.username}"
+		p:password="${log.jdbc.password}"
+		p:initialSize="${log.druid.initialSize}"
+		p:maxActive="${log.druid.maxActive}"
+		p:minIdle="${log.druid.minIdle}"
+		p:maxWait="${log.druid.maxWait}"
+		
+		p:timeBetweenEvictionRunsMillis="${log.druid.timeBetweenEvictionRunsMillis}"
+		p:minEvictableIdleTimeMillis="${log.druid.minEvictableIdleTimeMillis}"
+		p:removeAbandoned="${log.druid.removeAbandoned}"
+		p:removeAbandonedTimeout="${log.druid.removeAbandonedTimeout}"
+		
+		p:validationQuery="${log.druid.validationQuery}"
+		p:testWhileIdle="${log.druid.testWhileIdle}"
+		p:testOnBorrow="${log.druid.testOnBorrow}"
+		p:testOnReturn="${log.druid.testOnReturn}"
+		p:poolPreparedStatements="${log.druid.poolPreparedStatements}"
+		p:maxPoolPreparedStatementPerConnectionSize="${log.druid.maxPoolConnectionSize}"
+		p:connectionInitSqls="set names utf8mb4;"
+	/>
+	
+	<!-- Session Factory -->
+	<bean id="logsqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"
+		p:dataSource-ref="logdataSource"
+		p:mapperLocations="classpath:com/rose/bob/dao/*Mapper.xml"
+	/>
+	
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"
+		p:sqlSessionFactoryBeanName="logsqlSessionFactory" 
+		p:basePackage="com.mia.api.log.mapper"
+	/>
+	
+	<!-- SQL Session Template -->
+	<bean id="logsqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="logsqlSessionFactory" />
+	</bean>
+	
+	<!-- Transaction Manager -->
+	<bean id="logtransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+		p:dataSource-ref="logdataSource"
+	/>
+	
+	<tx:advice id="logTxAdvice" transaction-manager="logtransactionManager">
+		<tx:attributes>
+			<tx:method name="select*" propagation="NOT_SUPPORTED" read-only="true" />
+			<tx:method name="query*" propagation="NOT_SUPPORTED" read-only="true" />
+			<tx:method name="find*" propagation="NOT_SUPPORTED" read-only="true" />
+			<tx:method name="insert*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+			<tx:method name="save*" propagation="REQUIRED" rollback-for="java.lang.Exception" />
+			<tx:method name="delete*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+			<tx:method name="remove*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+			<tx:method name="update*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+			<tx:method name="modify*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+			<tx:method name="batch*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+			<tx:method name="add*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+		</tx:attributes>
+	</tx:advice>
+	
+	<aop:config>
+		<aop:pointcut id="logPointcut" expression="execution(* com.rose.bob.service..*.*(..))" />
+		<aop:advisor advice-ref="logTxAdvice" pointcut-ref="logPointcut" />
+	</aop:config>
+	
+</beans>

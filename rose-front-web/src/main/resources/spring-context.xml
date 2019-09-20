@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:task="http://www.springframework.org/schema/task"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.2.xsd"
+		default-lazy-init="true">
+    <aop:aspectj-autoproxy/>
+	<context:annotation-config/>
+	<!-- Properties File -->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+		p:ignoreResourceNotFound="true"
+		p:searchSystemEnvironment="true"
+		p:ignoreUnresolvablePlaceholders="true"
+		p:systemPropertiesModeName="SYSTEM_PROPERTIES_MODE_OVERRIDE"
+		p:fileEncoding="UTF-8">
+		<property name="locations">
+			<list>
+				<value>classpath:/jdbc.log.properties</value>
+				<!-- 本地开发环境配置 -->
+				<value>file:/d:/pop/store_web/config/*.properties</value>
+				<!-- 测试服务器/线上服务器文件位置 -->
+				<value>file:/opt/store_web/config/*.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- Component Scan -->
+	<context:component-scan base-package="com.rose">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+
+    <!-- 异步线程池 -->
+    <bean id="threadPool"
+          class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <!-- 核心线程数 -->
+        <property name="corePoolSize" value="10" />
+        <!-- 最大线程数 -->
+        <property name="maxPoolSize" value="32" />
+        <!-- 队列最大长度 >=mainExecutor.maxSize -->
+        <property name="queueCapacity" value="1000" />
+        <!-- 线程池维护线程所允许的空闲时间 -->
+        <property name="keepAliveSeconds" value="300" />
+        <!-- 线程池对拒绝任务(无线程可用)的处理策略 ThreadPoolExecutor.CallerRunsPolicy策略 ,调用者的线程会执行该任务,如果执行器已关闭,则丢弃.  -->
+        <property name="rejectedExecutionHandler">
+            <bean class="java.util.concurrent.ThreadPoolExecutor$DiscardPolicy" />
+        </property>
+    </bean>
+
+	<!-- 开启异步任务处理驱动 -->
+	<task:annotation-driven executor="threadPool" />
+
+	<!-- Spring retry -->
+	<bean id="retryTemplate" class="org.springframework.retry.support.RetryTemplate">
+		<property name="retryPolicy" ref="simpleRetryPolicy"/>
+		<property name="backOffPolicy" ref="fixedBackOffPolicy"/>
+	</bean>
+
+	<bean id="simpleRetryPolicy" class="org.springframework.retry.policy.SimpleRetryPolicy">
+		<property name="maxAttempts" value="3"/>
+	</bean>
+
+	<bean id="fixedBackOffPolicy" class="org.springframework.retry.backoff.FixedBackOffPolicy">
+		<property name="backOffPeriod" value="5000"/>
+	</bean>
+
+	<!-- MIA API -->
+	<import resource="classpath:spring-context-log.xml" />
+
+</beans>
