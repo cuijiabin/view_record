@@ -11,20 +11,33 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
 	<context:component-scan base-package="com.rose.bob.**.mvc">
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
 	</context:component-scan>
-	
+
+	<mvc:annotation-driven>
+		<mvc:message-converters register-defaults="true">
+			<bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+				<property name="supportedMediaTypes">
+					<list>
+						<value>application/json;charset=UTF-8</value>
+						<value>text/html;charset=UTF-8</value>
+					</list>
+				</property>
+				<property name="features">
+					<array>
+						<value>QuoteFieldNames</value>
+						<value>WriteDateUseDateFormat</value>
+					</array>
+				</property>
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+
+
 	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"
-		p:defaultEncoding="UTF-8" p:maxUploadSize="-1">
+		  p:defaultEncoding="UTF-8" p:maxUploadSize="-1">
 	</bean>
-	
+
 	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
-		p:prefix="/WEB-INF/page/" p:suffix=".jsp" p:attributesMap-ref="constants">
+		  p:prefix="/WEB-INF/page/" p:suffix=".jsp">
 	</bean>
-
-	<bean id="math" class="java.lang.Math"/>
-	<util:map id="constants">
-		<entry key="math" value-ref="math" />
-	</util:map>
-
-	<!-- 请求认证拦截器 -->
 
 </beans>
