@@ -42,7 +42,7 @@
 	
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"
 		p:sqlSessionFactoryBeanName="logsqlSessionFactory" 
-		p:basePackage="com.mia.api.log.mapper"
+		p:basePackage="com.rose.bob.dao"
 	/>
 	
 	<!-- SQL Session Template -->

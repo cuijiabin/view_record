@@ -31,7 +31,7 @@
     delete from freight_insure_order_log
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.rose.bob.domain.FreightInsureOrderLog">
+  <insert id="insert" parameterType="com.rose.bob.domain.FreightInsureOrderLog" useGeneratedKeys="true" keyProperty="id">
     insert into freight_insure_order_log (freight_insure_order_id, type,
       operator, description, create_user_id)
     values (#{freightInsureOrderId,jdbcType=INTEGER}, #{type,jdbcType=TINYINT},

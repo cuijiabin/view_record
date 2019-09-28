@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<substitutionProperty name="LOG_HOME" value="${catalina.base}/logs/" />
+	<jmxConfigurator />
+	<appender name="STD" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder charset="UTF-8">
+			<pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5level] %logger[%line] - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="LOG_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_HOME}/rose/info_%d{yyyyMMdd}.log</fileNamePattern>
+			<maxHistory>10</maxHistory>
+		</rollingPolicy>
+		<encoder charset="UTF-8">
+			<pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5level] %logger[%line] - %msg%n</pattern>
+		</encoder>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>INFO</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+	</appender>
+
+	<appender name="LOG_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_HOME}/rose/error_%d{yyyyMMdd}.log</fileNamePattern>
+			<maxHistory>10</maxHistory>
+		</rollingPolicy>
+		<encoder charset="UTF-8">
+			<pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5level] %logger[%line] - %msg%n</pattern>
+		</encoder>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>WARN</level>
+		</filter>
+	</appender>
+
+	<!-- TRACE/DEBUG/INFO/WARN/ERROR -->
+	<root level="DEBUG">
+		<appender-ref ref="STD" />
+		<appender-ref ref="LOG_DEBUG" />
+		<appender-ref ref="LOG_INFO" />
+		<appender-ref ref="LOG_ERROR" />
+	</root>
+
+	<logger name="com.rose" level="DEBUG" />
+</configuration>

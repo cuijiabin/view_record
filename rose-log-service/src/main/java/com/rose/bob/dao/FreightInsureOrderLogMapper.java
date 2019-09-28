@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface FreightInsureOrderLogMapper {
+
     int deleteByPrimaryKey(Integer id);
 
     int insert(FreightInsureOrderLog record);
